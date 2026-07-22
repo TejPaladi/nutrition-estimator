@@ -11,6 +11,29 @@ The package currently supports:
 The default missing-data behavior is `no-guess`: if required nutrients are missing,
 the package returns an insufficient-data result instead of inventing values.
 
+## Local Setup
+
+From the repo root:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+```
+
+Then run:
+
+```bash
+python examples/dunkin_example.py
+python -m unittest discover -s tests -v
+```
+
+For VS Code notebooks, select the Python interpreter from:
+
+```text
+.venv/bin/python
+```
+
 ## Quick Example
 
 ```python
@@ -63,4 +86,3 @@ For stricter FSA-style normalization, pass `basis="per_100g"` and include
 - MealRec+: A Meal Recommendation Dataset with Meal-Course Affiliation for Personalization and Healthiness. SIGIR 2024.
 - UK traffic-light nutrition labeling guidance for fat, saturated fat, sugars, and salt.
 - World Health Organization nutrition guidance for sugar, sodium, fats, saturated fats, protein, carbohydrates, and fiber.
-
