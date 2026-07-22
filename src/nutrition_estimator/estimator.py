@@ -1,0 +1,124 @@
+from __future__ import annotations
+
+from typing import Any, Iterable
+
+from .fsa import calculate_fsa
+from .nutrients import item_name
+from .who import calculate_who
+
+
+def estimate_food(
+    item: dict[str, Any],
+    *,
+    estimation_method: str = "fsa",
+    default: str = "no-guess",
+    basis: str = "provided",
+) -> dict[str, Any]:
+    """Estimate healthiness for a single food item."""
+    method = estimation_method.lower()
+    if method == "fsa":
+        result = calculate_fsa(item, default=default, basis=basis)
+    elif method == "who":
+        result = calculate_who(item, default=default, basis=basis)
+    elif method == "all":
+        return {
+            "item": item_name(item),
+            "estimation_method": "all",
+            "status": "estimated",
+            "scores": {
+                "fsa": calculate_fsa(item, default=default, basis=basis),
+                "who": calculate_who(item, default=default, basis="provided"),
+            },
+        }
+    else:
+        raise ValueError("estimation_method must be 'fsa', 'who', or 'all'")
+
+    return {
+        "item": item_name(item),
+        **result,
+    }
+
+
+def estimate_meal(
+    items: Iterable[dict[str, Any]],
+    *,
+    estimation_method: str = "fsa",
+    default: str = "no-guess",
+    basis: str = "provided",
+) -> dict[str, Any]:
+    """Estimate healthiness for a meal by averaging item-level scores."""
+    item_list = list(items)
+    method = estimation_method.lower()
+    if method == "all":
+        return {
+            "estimation_method": "all",
+            "items": [
+                estimate_food(item, estimation_method="all", default=default, basis=basis)
+                for item in item_list
+            ],
+            "total": {
+                "fsa": _aggregate_method(item_list, "fsa", default, basis),
+                "who": _aggregate_method(item_list, "who", default, "provided"),
+            },
+        }
+    if method not in {"fsa", "who"}:
+        raise ValueError("estimation_method must be 'fsa', 'who', or 'all'")
+
+    item_results = [
+        estimate_food(item, estimation_method=method, default=default, basis=basis)
+        for item in item_list
+    ]
+    return {
+        "estimation_method": method,
+        "items": item_results,
+        "total": _aggregate_results(item_results, method),
+    }
+
+
+def _aggregate_method(
+    items: list[dict[str, Any]],
+    method: str,
+    default: str,
+    basis: str,
+) -> dict[str, Any]:
+    item_results = [
+        estimate_food(item, estimation_method=method, default=default, basis=basis)
+        for item in items
+    ]
+    return _aggregate_results(item_results, method)
+
+
+def _aggregate_results(item_results: list[dict[str, Any]], method: str) -> dict[str, Any]:
+    values = [
+        float(result["estimated_value"])
+        for result in item_results
+        if isinstance(result.get("estimated_value"), (int, float))
+    ]
+    missing_items = [
+        {
+            "item": result.get("item"),
+            "missing_fields": result.get("missing_fields", []),
+        }
+        for result in item_results
+        if not isinstance(result.get("estimated_value"), (int, float))
+    ]
+    if not values:
+        return {
+            "meal_score": None,
+            "status": "insufficient_data",
+            "aggregation": "mean_of_item_scores",
+            "item_scores_used": 0,
+            "missing_items": missing_items,
+            "range": "4-12" if method == "fsa" else "0-7",
+            "direction": "lower_is_healthier" if method == "fsa" else "higher_is_healthier",
+        }
+    return {
+        "meal_score": round(sum(values) / len(values), 3),
+        "status": "estimated" if not missing_items else "partial",
+        "aggregation": "mean_of_item_scores",
+        "item_scores_used": len(values),
+        "missing_items": missing_items,
+        "range": "4-12" if method == "fsa" else "0-7",
+        "direction": "lower_is_healthier" if method == "fsa" else "higher_is_healthier",
+    }
+

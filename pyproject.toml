@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nutrition-estimator"
+version = "0.1.0"
+description = "Reproducible FSA and WHO-style nutrition scoring for foods and meals."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Beacon Meal Recommendation Team" }]
+license = { text = "MIT" }
+keywords = ["nutrition", "meal recommendation", "FSA", "WHO", "healthiness"]
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
