@@ -11,10 +11,35 @@ The package currently supports:
 The default missing-data behavior is `no-guess`: if required nutrients are missing,
 the package returns an insufficient-data result instead of inventing values.
 
+## API Summary
+
+Most projects only need these two functions:
+
+```python
+from nutrition_estimator import estimate_food, estimate_meal
+```
+
+| Function | Input | Output |
+|---|---|---|
+| `estimate_food(item, estimation_method="fsa")` | One food item dictionary | Compact score result for one item |
+| `estimate_meal(items, estimation_method="all")` | List of food item dictionaries | Item-level scores plus meal-level average |
+
+Supported methods:
+
+```text
+fsa
+who
+all
+```
+
+Default output is compact. Use `verbose=True` when you need component scores,
+normalized inputs, and formula details.
+
 ## Repository Structure
 
 ```text
 nutrition-estimator/
+  LICENSE
   README.md
   pyproject.toml
   src/
@@ -46,6 +71,7 @@ nutrition-estimator/
 | `references/README.md` | Method notes, formulas, score ranges, and missing-data policy. |
 | `tests/test_estimator.py` | Unit tests for food scoring, meal aggregation, and missing-field behavior. |
 | `pyproject.toml` | Python packaging configuration. |
+| `LICENSE` | MIT license for reuse in research and application projects. |
 
 ## How The Code Is Written
 

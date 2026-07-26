@@ -13,10 +13,14 @@ license = { text = "MIT" }
 keywords = ["nutrition", "meal recommendation", "FSA", "WHO", "healthiness"]
 dependencies = []
 
+[project.urls]
+Homepage = "https://github.com/TejPaladi/nutrition-estimator"
+Repository = "https://github.com/TejPaladi/nutrition-estimator"
+Issues = "https://github.com/TejPaladi/nutrition-estimator/issues"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-
