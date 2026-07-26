@@ -181,38 +181,6 @@ then average the available item/course scores.
 meal = estimate_meal([item_1, item_2, item_3], estimation_method="all")
 ```
 
-## Input Format
-
-Each food item should be a dictionary with a `nutrition` block. The `name`
-field is optional and is only used for readable output.
-
-```python
-item = {
-    "name": "Example Food",  # optional
-    "nutrition": {          # required
-        "calories": 250,    # required for WHO
-        "protein_g": 10,    # required for WHO
-        "carbs_g": 35,      # required for WHO
-        "sugar_g": 8,       # required for FSA and WHO
-        "sodium_mg": 420,   # required for FSA and WHO; salt_g can replace it for FSA
-        "fat_g": 9,         # required for FSA and WHO
-        "saturated_fat_g": 3,  # required for FSA and WHO
-        "fiber_g": 2,       # required for WHO
-    },
-}
-```
-
-The package also accepts several common aliases, including `Sugar`, `Sodium`,
-`Fat`, `Saturated Fat`, `Protein`, `Carbohydrates`, and `Fiber`.
-
-### Required Fields
-
-| Method | Required nutrition fields | Optional item fields |
-|---|---|---|
-| `fsa` | `sugar_g`, `sodium_mg` or `salt_g`, `fat_g`, `saturated_fat_g` | `name`, `id`, `recipe_name` |
-| `who` | `calories`, `protein_g`, `carbs_g`, `sugar_g`, `sodium_mg`, `fat_g`, `saturated_fat_g`, `fiber_g` | `name`, `id`, `recipe_name` |
-| `all` | all fields required by both `fsa` and `who` | `name`, `id`, `recipe_name` |
-
 ## Score Ranges
 
 | Method | Range | Direction |
@@ -358,24 +326,6 @@ score is guessed. The result uses a clear indicator:
     "missing_fields": ["fat_g", "saturated_fat_g"]
 }
 ```
-
-## Notes
-
-FSA traffic-light thresholds are commonly defined per 100g or 100ml. Many
-restaurant and recipe datasets, including the data we use in the Beacon app,
-provide nutrition per serving. This package therefore labels the score basis in
-the output and supports the values exactly as provided by default.
-
-For stricter FSA-style normalization, pass `basis="per_100g"` and include
-`serving_size_g` in the item.
-
-The WHO score in this package is a transparent WHO-style implementation for
-recommendation experiments. WHO publishes broad healthy-diet guidance for
-nutrients such as sugar, sodium/salt, fats, saturated fats, carbohydrates,
-protein, and fiber; this package turns those ideas into explicit binary checks
-so the calculation is reproducible. If a project needs a different clinical or
-regulatory nutrient profile model, add it as a separate `estimation_method`
-rather than silently changing the default `who` behavior.
 
 ## Adapting This To Another Project
 
