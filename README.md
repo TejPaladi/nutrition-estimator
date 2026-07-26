@@ -138,16 +138,16 @@ For VS Code notebooks, select the Python interpreter from:
 from nutrition_estimator import estimate_food, estimate_meal
 
 item = {
-    "name": "Dunkin Omelet Bites",
-    "nutrition": {
-        "calories": 180,
-        "protein_g": 13,
-        "carbs_g": 7,
-        "sugar_g": 2,
-        "sodium_mg": 460,
-        "fat_g": 11,
-        "saturated_fat_g": 5,
-        "fiber_g": 1,
+    "name": "Dunkin Omelet Bites",  # optional, used only for readable output
+    "nutrition": {                  # required
+        "calories": 180,            # required for WHO
+        "protein_g": 13,            # required for WHO
+        "carbs_g": 7,               # required for WHO
+        "sugar_g": 2,               # required for FSA and WHO
+        "sodium_mg": 460,           # required for FSA and WHO; salt_g can replace it for FSA
+        "fat_g": 11,                # required for FSA and WHO
+        "saturated_fat_g": 5,       # required for FSA and WHO
+        "fiber_g": 1,               # required for WHO
     },
 }
 
@@ -189,15 +189,15 @@ field is optional and is only used for readable output.
 ```python
 item = {
     "name": "Example Food",  # optional
-    "nutrition": {
-        "calories": 250,
-        "protein_g": 10,
-        "carbs_g": 35,
-        "sugar_g": 8,
-        "sodium_mg": 420,
-        "fat_g": 9,
-        "saturated_fat_g": 3,
-        "fiber_g": 2,
+    "nutrition": {          # required
+        "calories": 250,    # required for WHO
+        "protein_g": 10,    # required for WHO
+        "carbs_g": 35,      # required for WHO
+        "sugar_g": 8,       # required for FSA and WHO
+        "sodium_mg": 420,   # required for FSA and WHO; salt_g can replace it for FSA
+        "fat_g": 9,         # required for FSA and WHO
+        "saturated_fat_g": 3,  # required for FSA and WHO
+        "fiber_g": 2,       # required for WHO
     },
 }
 ```
@@ -423,29 +423,29 @@ from nutrition_estimator import estimate_meal
 
 recommended_meal = [
     {
-        "name": "Omelet Bites",
-        "nutrition": {
-            "calories": 180,
-            "protein_g": 13,
-            "carbs_g": 7,
-            "sugar_g": 2,
-            "sodium_mg": 460,
-            "fat_g": 11,
-            "saturated_fat_g": 5,
-            "fiber_g": 1,
+        "name": "Omelet Bites",  # optional
+        "nutrition": {           # required
+            "calories": 180,     # required for WHO
+            "protein_g": 13,     # required for WHO
+            "carbs_g": 7,        # required for WHO
+            "sugar_g": 2,        # required for FSA and WHO
+            "sodium_mg": 460,    # required for FSA and WHO; salt_g can replace it for FSA
+            "fat_g": 11,         # required for FSA and WHO
+            "saturated_fat_g": 5,  # required for FSA and WHO
+            "fiber_g": 1,        # required for WHO
         },
     },
     {
-        "name": "Iced Coffee",
-        "nutrition": {
-            "calories": 158,
-            "protein_g": 1,
-            "carbs_g": 29,
-            "sugar_g": 33,
-            "sodium_mg": 98,
-            "fat_g": 3,
-            "saturated_fat_g": 2,
-            "fiber_g": 0,
+        "name": "Iced Coffee",  # optional
+        "nutrition": {          # required
+            "calories": 158,    # required for WHO
+            "protein_g": 1,     # required for WHO
+            "carbs_g": 29,      # required for WHO
+            "sugar_g": 33,      # required for FSA and WHO
+            "sodium_mg": 98,    # required for FSA and WHO; salt_g can replace it for FSA
+            "fat_g": 3,         # required for FSA and WHO
+            "saturated_fat_g": 2,  # required for FSA and WHO
+            "fiber_g": 0,       # required for WHO
         },
     },
 ]
