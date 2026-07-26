@@ -320,6 +320,14 @@ the output and supports the values exactly as provided by default.
 For stricter FSA-style normalization, pass `basis="per_100g"` and include
 `serving_size_g` in the item.
 
+The WHO score in this package is a transparent WHO-style implementation for
+recommendation experiments. WHO publishes broad healthy-diet guidance for
+nutrients such as sugar, sodium/salt, fats, saturated fats, carbohydrates,
+protein, and fiber; this package turns those ideas into explicit binary checks
+so the calculation is reproducible. If a project needs a different clinical or
+regulatory nutrient profile model, add it as a separate `estimation_method`
+rather than silently changing the default `who` behavior.
+
 ## Adapting This To Another Project
 
 There are two simple ways to use this package.
@@ -444,6 +452,9 @@ different nutrition scores in the same UI.
 
 ## References
 
-- MealRec+: A Meal Recommendation Dataset with Meal-Course Affiliation for Personalization and Healthiness. SIGIR 2024.
-- UK traffic-light nutrition labeling guidance for fat, saturated fat, sugars, and salt.
-- World Health Organization nutrition guidance for sugar, sodium, fats, saturated fats, protein, carbohydrates, and fiber.
+- Ming Li, Lin Li, Xiaohui Tao, and Jimmy Xiangji Huang. 2024. **MealRec+: A Meal Recommendation Dataset with Meal-Course Affiliation for Personalization and Healthiness.** SIGIR 2024. arXiv: https://arxiv.org/abs/2404.05386
+- MealRec+ GitHub repository and dataset description: https://github.com/WUT-IDEA/MealRecPlus
+- NHS food-label guidance for high/low thresholds for fat, saturated fat, sugars, and salt: https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/how-to-read-food-labels/
+- GOV.UK front-of-pack traffic-light label explanation: https://www.gov.uk/government/publications/check-the-label/check-the-label
+- World Health Organization healthy diet fact sheet: https://www.who.int/news-room/fact-sheets/detail/healthy-diet
+- WHO technical report on diet, nutrition, and prevention of chronic diseases: https://www.who.int/publications/i/item/924120916X

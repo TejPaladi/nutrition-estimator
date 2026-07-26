@@ -1,5 +1,10 @@
 # References and Method Notes
 
+This package is designed for transparent recommendation experiments. It does
+not hide missing nutrition data or call a black-box scoring service. The score
+formulas and thresholds are documented here so another project can reproduce or
+replace them.
+
 ## FSA
 
 The FSA-style score is based on traffic-light thresholds for:
@@ -39,6 +44,13 @@ Sodium conversion:
 salt_g = sodium_mg * 2.5 / 1000
 ```
 
+Threshold source notes:
+
+- NHS food-label guidance lists high/low thresholds for total fat, saturated
+  fat, sugars, and salt: https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/how-to-read-food-labels/
+- GOV.UK explains front-of-pack traffic-light labeling for fat, saturates,
+  sugar, salt, and energy: https://www.gov.uk/government/publications/check-the-label/check-the-label
+
 ## WHO
 
 The WHO-style score checks seven nutrients:
@@ -70,6 +82,21 @@ Direction:
 higher is healthier
 ```
 
+Method note:
+
+The WHO score here is a transparent WHO-style nutrient-range score for
+recommendation experiments. WHO publishes healthy-diet guidance for nutrients
+such as sugars, sodium/salt, fats, saturated fats, carbohydrates, protein, and
+fiber. This package converts those nutrient dimensions into explicit binary
+checks so the output is reproducible. If a project needs a different WHO or
+regional nutrient profile model, it should be added as a separate method.
+
+Relevant WHO sources:
+
+- WHO healthy diet fact sheet: https://www.who.int/news-room/fact-sheets/detail/healthy-diet
+- WHO technical report, *Diet, Nutrition and the Prevention of Chronic
+  Diseases*: https://www.who.int/publications/i/item/924120916X
+
 ## Meal Aggregation
 
 MealRec+ computes healthiness at the course/item level first. Meal-level
@@ -81,6 +108,13 @@ meal_who = mean(item_who scores)
 ```
 
 This package follows that structure.
+
+MealRec+ sources:
+
+- Paper: Ming Li, Lin Li, Xiaohui Tao, and Jimmy Xiangji Huang. 2024.
+  *MealRec+: A Meal Recommendation Dataset with Meal-Course Affiliation for
+  Personalization and Healthiness.* SIGIR 2024. https://arxiv.org/abs/2404.05386
+- Dataset repository: https://github.com/WUT-IDEA/MealRecPlus
 
 ## Missing Data Policy
 
@@ -97,4 +131,3 @@ status = "insufficient_data"
 estimated_value = None
 missing_fields = [...]
 ```
-
