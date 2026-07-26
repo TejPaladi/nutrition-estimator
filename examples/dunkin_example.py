@@ -45,8 +45,12 @@ ICED_COFFEE = {
 
 
 if __name__ == "__main__":
-    print("Single item FSA:")
+    print("Single item FSA, compact output:")
     print(estimate_food(OMELET_BITES, estimation_method="fsa"))
+    print()
+
+    print("Single item FSA, verbose output:")
+    print(estimate_food(OMELET_BITES, estimation_method="fsa", verbose=True))
     print()
 
     print("Single item WHO:")
@@ -60,4 +64,3 @@ if __name__ == "__main__":
             estimation_method="all",
         )
     )
-

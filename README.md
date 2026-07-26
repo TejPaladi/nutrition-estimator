@@ -60,6 +60,10 @@ The package is intentionally split into small modules:
 4. `estimator.py` combines these methods into user-facing functions for food
    items and full meals.
 
+The public estimator functions return compact output by default. Use
+`verbose=True` when you need formula details, component scores, normalized
+inputs, or method text for debugging/research notes.
+
 The main design rule is:
 
 ```text
@@ -123,6 +127,25 @@ item = {
 
 print(estimate_food(item, estimation_method="fsa"))
 print(estimate_food(item, estimation_method="who"))
+```
+
+Default output is intentionally compact:
+
+```python
+{
+    "item": "Dunkin Omelet Bites",
+    "estimation_method": "fsa",
+    "estimated_value": 7,
+    "range": "4-12",
+    "direction": "lower_is_healthier",
+    "status": "estimated",
+}
+```
+
+For full calculation details:
+
+```python
+estimate_food(item, estimation_method="fsa", verbose=True)
 ```
 
 Meal-level scoring follows the MealRec+ style: score each item/course first,

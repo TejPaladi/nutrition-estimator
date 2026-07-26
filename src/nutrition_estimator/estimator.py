@@ -13,6 +13,7 @@ def estimate_food(
     estimation_method: str = "fsa",
     default: str = "no-guess",
     basis: str = "provided",
+    verbose: bool = False,
 ) -> dict[str, Any]:
     """Estimate healthiness for a single food item."""
     method = estimation_method.lower()
@@ -26,8 +27,14 @@ def estimate_food(
             "estimation_method": "all",
             "status": "estimated",
             "scores": {
-                "fsa": calculate_fsa(item, default=default, basis=basis),
-                "who": calculate_who(item, default=default, basis="provided"),
+                "fsa": _format_food_result(
+                    calculate_fsa(item, default=default, basis=basis),
+                    verbose=verbose,
+                ),
+                "who": _format_food_result(
+                    calculate_who(item, default=default, basis="provided"),
+                    verbose=verbose,
+                ),
             },
         }
     else:
@@ -35,7 +42,7 @@ def estimate_food(
 
     return {
         "item": item_name(item),
-        **result,
+        **_format_food_result(result, verbose=verbose),
     }
 
 
@@ -45,6 +52,7 @@ def estimate_meal(
     estimation_method: str = "fsa",
     default: str = "no-guess",
     basis: str = "provided",
+    verbose: bool = False,
 ) -> dict[str, Any]:
     """Estimate healthiness for a meal by averaging item-level scores."""
     item_list = list(items)
@@ -53,7 +61,13 @@ def estimate_meal(
         return {
             "estimation_method": "all",
             "items": [
-                estimate_food(item, estimation_method="all", default=default, basis=basis)
+                estimate_food(
+                    item,
+                    estimation_method="all",
+                    default=default,
+                    basis=basis,
+                    verbose=verbose,
+                )
                 for item in item_list
             ],
             "total": {
@@ -65,7 +79,13 @@ def estimate_meal(
         raise ValueError("estimation_method must be 'fsa', 'who', or 'all'")
 
     item_results = [
-        estimate_food(item, estimation_method=method, default=default, basis=basis)
+        estimate_food(
+            item,
+            estimation_method=method,
+            default=default,
+            basis=basis,
+            verbose=verbose,
+        )
         for item in item_list
     ]
     return {
@@ -86,6 +106,23 @@ def _aggregate_method(
         for item in items
     ]
     return _aggregate_results(item_results, method)
+
+
+def _format_food_result(result: dict[str, Any], *, verbose: bool) -> dict[str, Any]:
+    required_keys = [
+        "estimation_method",
+        "estimated_value",
+        "range",
+        "direction",
+        "status",
+    ]
+    compact = {key: result.get(key) for key in required_keys}
+    if result.get("status") != "estimated":
+        compact["missing_fields"] = result.get("missing_fields", [])
+    if verbose:
+        for key, value in result.items():
+            compact.setdefault(key, value)
+    return compact
 
 
 def _aggregate_results(item_results: list[dict[str, Any]], method: str) -> dict[str, Any]:
@@ -121,4 +158,3 @@ def _aggregate_results(item_results: list[dict[str, Any]], method: str) -> dict[
         "range": "4-12" if method == "fsa" else "0-7",
         "direction": "lower_is_healthier" if method == "fsa" else "higher_is_healthier",
     }
-

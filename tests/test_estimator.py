@@ -60,6 +60,32 @@ class NutritionEstimatorTests(unittest.TestCase):
         self.assertIn("fat_g", result["missing_fields"])
         self.assertIn("saturated_fat_g", result["missing_fields"])
 
+    def test_estimate_food_default_output_is_compact(self):
+        result = estimate_food(OMELET_BITES, estimation_method="fsa")
+
+        self.assertEqual(
+            result,
+            {
+                "item": "Dunkin Omelet Bites",
+                "estimation_method": "fsa",
+                "estimated_value": 7,
+                "range": "4-12",
+                "direction": "lower_is_healthier",
+                "status": "estimated",
+            },
+        )
+
+    def test_estimate_food_verbose_output_includes_explanation(self):
+        result = estimate_food(OMELET_BITES, estimation_method="fsa", verbose=True)
+
+        self.assertEqual(result["estimated_value"], 7)
+        self.assertEqual(
+            result["components"],
+            {"sugar": 1, "salt": 2, "fat": 2, "saturated_fat": 2},
+        )
+        self.assertEqual(result["normalized_inputs"]["salt_g"], 1.15)
+        self.assertIn("method", result)
+
     def test_name_is_optional(self):
         result = estimate_food(
             {
