@@ -1,3 +1,13 @@
+"""WHO-style nutrient-range scoring.
+
+This module provides a transparent 0-7 score for recommendation experiments.
+Each nutrient condition contributes one point when satisfied. The final range
+is 0-7, where higher is healthier.
+
+The implementation is intentionally explicit and reproducible rather than a
+black-box clinical nutrition classifier.
+"""
+
 from __future__ import annotations
 
 from typing import Any
@@ -24,6 +34,10 @@ def calculate_who(
     The current implementation is designed for transparent recommendation
     experiments. It checks seven nutrient conditions and returns one point for
     each satisfied condition.
+
+    Required fields are calories, protein, carbohydrates, sugar, sodium, fat,
+    saturated fat, and fiber. Missing data returns
+    `status="insufficient_data"` and no guessed score.
     """
     if default != "no-guess":
         raise ValueError("Only default='no-guess' is supported in v0.1.")
@@ -101,4 +115,3 @@ def calculate_who(
             "saturated_fat_energy_share": round(saturated_fat_energy_share, 3),
         },
     }
-

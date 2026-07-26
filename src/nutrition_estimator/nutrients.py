@@ -1,3 +1,10 @@
+"""Helpers for reading nutrition values from flexible food dictionaries.
+
+The package accepts a compact project-friendly schema such as
+`nutrition["sugar_g"]`, but it also handles common labels like `"Sugar"` or
+`"Saturated Fat"` from scraped restaurant/menu data.
+"""
+
 from __future__ import annotations
 
 import re
@@ -24,14 +31,18 @@ NUTRIENT_ALIASES: dict[str, list[str]] = {
 
 
 def item_name(item: dict[str, Any]) -> str | None:
+    """Return a readable item identifier when one is provided."""
     value = item.get("name") or item.get("recipe_name") or item.get("id")
     return str(value) if value not in (None, "") else None
 
 
 def nutrition_block(item_or_nutrition: dict[str, Any] | None) -> dict[str, Any]:
+    """Return the nested nutrition/macronutrient block, or the input itself."""
     if not isinstance(item_or_nutrition, dict):
         return {}
-    if "nutrition" in item_or_nutrition and isinstance(item_or_nutrition["nutrition"], dict):
+    if "nutrition" in item_or_nutrition and isinstance(
+        item_or_nutrition["nutrition"], dict
+    ):
         return item_or_nutrition["nutrition"]
     if "macronutrients" in item_or_nutrition and isinstance(
         item_or_nutrition["macronutrients"], dict
@@ -41,6 +52,7 @@ def nutrition_block(item_or_nutrition: dict[str, Any] | None) -> dict[str, Any]:
 
 
 def nutrient_number(nutrition: dict[str, Any] | None, canonical_key: str) -> float | None:
+    """Extract a nutrient as a float using the known aliases for that nutrient."""
     nutrition = nutrition_block(nutrition)
     for key in NUTRIENT_ALIASES.get(canonical_key, [canonical_key]):
         if key not in nutrition:
@@ -58,6 +70,7 @@ def nutrient_number(nutrition: dict[str, Any] | None, canonical_key: str) -> flo
 
 
 def sodium_to_salt_g(sodium_mg: float) -> float:
+    """Convert sodium in milligrams to salt in grams."""
     return sodium_mg * 2.5 / 1000
 
 
@@ -66,6 +79,7 @@ def value_for_basis(
     serving_size_g: float | None,
     basis: str,
 ) -> float | None:
+    """Use a nutrient as provided or normalize it to a per-100g basis."""
     if value is None:
         return None
     if basis == "provided":

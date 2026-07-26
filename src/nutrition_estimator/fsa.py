@@ -1,3 +1,15 @@
+"""FSA-style traffic-light scoring.
+
+The FSA-style score uses four nutrition components: sugar, salt, fat, and
+saturated fat. Each component is mapped to a traffic-light value:
+
+- green = 1
+- amber = 2
+- red = 3
+
+The final range is 4-12, where lower is healthier.
+"""
+
 from __future__ import annotations
 
 from typing import Any
@@ -11,6 +23,7 @@ FSA_DIRECTION = "lower_is_healthier"
 
 
 def _traffic_light_score(value: float, low: float, high: float) -> int:
+    """Map a nutrient amount to green/amber/red numeric traffic-light score."""
     if value <= low:
         return 1
     if value > high:
@@ -28,6 +41,10 @@ def calculate_fsa(
 
     `basis="provided"` uses nutrients exactly as supplied. `basis="per_100g"`
     normalizes gram and milligram nutrient values using `serving_size_g`.
+
+    Required fields are sugar, fat, saturated fat, and either sodium or salt.
+    Sodium is converted to salt using `salt_g = sodium_mg * 2.5 / 1000`.
+    Missing data returns `status="insufficient_data"` and no guessed score.
     """
     if default != "no-guess":
         raise ValueError("Only default='no-guess' is supported in v0.1.")
@@ -102,4 +119,3 @@ def calculate_fsa(
             "saturated_fat_g": round(saturated_fat, 3),
         },
     }
-

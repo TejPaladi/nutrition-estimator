@@ -1,3 +1,12 @@
+"""Small runnable example for the nutrition-estimator package.
+
+Run from the repository root:
+
+    python examples/dunkin_example.py
+
+The example shows compact output, verbose output, and meal-level aggregation.
+"""
+
 from nutrition_estimator import estimate_food, estimate_meal
 
 
