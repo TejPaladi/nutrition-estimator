@@ -60,6 +60,22 @@ class NutritionEstimatorTests(unittest.TestCase):
         self.assertIn("fat_g", result["missing_fields"])
         self.assertIn("saturated_fat_g", result["missing_fields"])
 
+    def test_name_is_optional(self):
+        result = estimate_food(
+            {
+                "nutrition": {
+                    "sugar_g": 2,
+                    "sodium_mg": 460,
+                    "fat_g": 11,
+                    "saturated_fat_g": 5,
+                }
+            },
+            estimation_method="fsa",
+        )
+
+        self.assertIsNone(result["item"])
+        self.assertEqual(result["estimated_value"], 7)
+
     def test_meal_averages_item_scores(self):
         meal = estimate_meal(
             [
@@ -88,4 +104,3 @@ class NutritionEstimatorTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

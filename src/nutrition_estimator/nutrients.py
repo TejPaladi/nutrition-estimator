@@ -23,8 +23,9 @@ NUTRIENT_ALIASES: dict[str, list[str]] = {
 }
 
 
-def item_name(item: dict[str, Any]) -> str:
-    return str(item.get("name") or item.get("recipe_name") or item.get("id") or "")
+def item_name(item: dict[str, Any]) -> str | None:
+    value = item.get("name") or item.get("recipe_name") or item.get("id")
+    return str(value) if value not in (None, "") else None
 
 
 def nutrition_block(item_or_nutrition: dict[str, Any] | None) -> dict[str, Any]:
@@ -74,4 +75,3 @@ def value_for_basis(
             return None
         return value * 100 / serving_size_g
     raise ValueError("basis must be 'provided' or 'per_100g'")
-

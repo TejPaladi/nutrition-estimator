@@ -134,11 +134,12 @@ meal = estimate_meal([item_1, item_2, item_3], estimation_method="all")
 
 ## Input Format
 
-Each food item should be a dictionary with a `name` and a `nutrition` block:
+Each food item should be a dictionary with a `nutrition` block. The `name`
+field is optional and is only used for readable output.
 
 ```python
 item = {
-    "name": "Example Food",
+    "name": "Example Food",  # optional
     "nutrition": {
         "calories": 250,
         "protein_g": 10,
@@ -155,12 +156,159 @@ item = {
 The package also accepts several common aliases, including `Sugar`, `Sodium`,
 `Fat`, `Saturated Fat`, `Protein`, `Carbohydrates`, and `Fiber`.
 
+### Required Fields
+
+| Method | Required nutrition fields | Optional item fields |
+|---|---|---|
+| `fsa` | `sugar_g`, `sodium_mg` or `salt_g`, `fat_g`, `saturated_fat_g` | `name`, `id`, `recipe_name` |
+| `who` | `calories`, `protein_g`, `carbs_g`, `sugar_g`, `sodium_mg`, `fat_g`, `saturated_fat_g`, `fiber_g` | `name`, `id`, `recipe_name` |
+| `all` | all fields required by both `fsa` and `who` | `name`, `id`, `recipe_name` |
+
 ## Score Ranges
 
 | Method | Range | Direction |
 |---|---:|---|
 | FSA | 4 to 12 | lower is healthier |
 | WHO | 0 to 7 | higher is healthier |
+
+## Formulas
+
+### FSA
+
+FSA uses four traffic-light components:
+
+```text
+FSA = sugar_score + salt_score + fat_score + saturated_fat_score
+```
+
+Each component receives:
+
+```text
+green = 1
+amber = 2
+red = 3
+```
+
+If sodium is provided instead of salt, it is converted as:
+
+```text
+salt_g = sodium_mg * 2.5 / 1000
+```
+
+The package currently uses these traffic-light thresholds:
+
+| Component | Green | Amber | Red |
+|---|---:|---:|---:|
+| sugar | `<= 5 g` | `> 5 g` and `<= 22.5 g` | `> 22.5 g` |
+| salt | `<= 0.3 g` | `> 0.3 g` and `<= 1.5 g` | `> 1.5 g` |
+| fat | `<= 3 g` | `> 3 g` and `<= 17.5 g` | `> 17.5 g` |
+| saturated fat | `<= 1.5 g` | `> 1.5 g` and `<= 5 g` | `> 5 g` |
+
+Example:
+
+```text
+sugar = 2 g            -> green -> 1
+sodium = 460 mg        -> salt = 1.15 g -> amber -> 2
+fat = 11 g             -> amber -> 2
+saturated fat = 5 g    -> amber -> 2
+
+FSA = 1 + 2 + 2 + 2 = 7
+```
+
+Range:
+
+```text
+4 = healthiest, 12 = least healthy
+```
+
+### WHO
+
+WHO-style scoring uses seven binary checks:
+
+```text
+WHO = protein_ok + carbs_ok + sugar_ok + sodium_ok
+    + fat_ok + saturated_fat_ok + fiber_ok
+```
+
+Each component receives:
+
+```text
+1 = condition satisfied
+0 = condition not satisfied
+```
+
+The package currently uses these checks:
+
+| Component | Condition |
+|---|---|
+| protein | `protein_g >= 5` |
+| carbohydrates | `0 <= carbs_g <= 75` |
+| sugar | `sugar_g <= 25` |
+| sodium | `sodium_mg <= 600` |
+| fat | `(fat_g * 9 / calories) < 0.30` |
+| saturated fat | `(saturated_fat_g * 9 / calories) < 0.10` |
+| fiber | `fiber_g >= 3` |
+
+Example:
+
+```text
+calories = 180
+protein = 13 g          -> ok -> 1
+carbs = 7 g             -> ok -> 1
+sugar = 2 g             -> ok -> 1
+sodium = 460 mg         -> ok -> 1
+fat = 11 g              -> 11*9/180 = 0.55 -> not ok -> 0
+saturated fat = 5 g     -> 5*9/180 = 0.25 -> not ok -> 0
+fiber = 1 g             -> not ok -> 0
+
+WHO = 1 + 1 + 1 + 1 + 0 + 0 + 0 = 4
+```
+
+Range:
+
+```text
+0 = least healthy, 7 = healthiest
+```
+
+### Meal-Level Formula
+
+Meal-level scoring follows the MealRec+ style: score each item/course first,
+then average item scores.
+
+```text
+meal_fsa = mean(item_fsa scores)
+meal_who = mean(item_who scores)
+```
+
+Example:
+
+```text
+item FSA scores = 7, 10, 8
+meal_fsa = (7 + 10 + 8) / 3 = 8.333
+
+item WHO scores = 4, 4, 3
+meal_who = (4 + 4 + 3) / 3 = 3.667
+```
+
+## Missing Data Behavior
+
+The default policy is:
+
+```text
+default="no-guess"
+```
+
+If any required field is missing, the calculation does not succeed and no
+score is guessed. The result uses a clear indicator:
+
+```python
+{
+    "estimated_value": None,
+    "total": None,
+    "status": "insufficient_data",
+    "missing_fields": ["fat_g", "saturated_fat_g"]
+}
+```
 
 ## Notes
 
